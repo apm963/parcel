@@ -26,6 +26,15 @@ class TypeScriptAsset extends Asset {
 
     let tsconfig = await this.getConfig(['tsconfig.json']);
 
+    if (tsconfig && tsconfig.extends) {
+      const extendedTsconfig = await this.getConfig([tsconfig.extends]);
+      if (extendedTsconfig) {
+        Object.keys(extendedTsconfig).forEach(key => {
+          tsconfig[key] = { ...(tsconfig[key] || {}), ...(extendedTsconfig[key] || {}) };
+        });
+      }
+    }
+
     // Overwrite default if config is found
     if (tsconfig) {
       transpilerOptions.compilerOptions = Object.assign(
